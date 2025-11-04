@@ -1,0 +1,38 @@
+version: '0.2'
+
+phases:
+  install:
+    commands:
+      - echo "[install] ubicacion inicial:"; pwd
+      - echo "[install] habilitando Node 22 via nvm"
+      - . /usr/local/nvm/nvm.sh || true
+      - nvm --version || true
+      - nvm install 22 || true
+      - nvm use 22 || true
+      - node -v
+      - npm -v
+      - echo "[install] moviendose a $CODEBUILD_SRC_DIR"
+      - cd "$CODEBUILD_SRC_DIR"
+      - echo "[install] en:"; pwd
+      - ls -la
+      - echo "[install] package.json presente:"; test -f package.json && echo OK || (echo NO && exit 1)
+      - npm ci
+  pre_build:
+    commands:
+      - echo "[pre_build] en:"; pwd
+      - ls -la
+      - echo "[pre_build] scripts:"; node -e "console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).scripts)"
+      - npm run -s test --color
+  build:
+    commands:
+      - echo "[build] creando artefacto..."
+      - zip -r code.zip .
+  post_build:
+    commands:
+      - echo "Build completed!"
+
+artifacts:
+  files:
+    - '**/*'
+    - code.zip
+  discard-paths: yes
