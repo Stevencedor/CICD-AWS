@@ -2,6 +2,8 @@ import app from './index.js';
 import request from 'supertest';
 import test from 'node:test';
 
+console.log("ejecutando pruebas....");
+
 describe('Prueba de los endpoints de express', () => {
     test("GET / devoler mensaje de bienvenida con estado 200", async () => {
         const response =  await request(app).get('/');
@@ -10,6 +12,4 @@ describe('Prueba de los endpoints de express', () => {
     });
 });
 
-
-console.log("ejecutando pruebas....");
 console.log("pruebas ejecutadas correctamente!");
