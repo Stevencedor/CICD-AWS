@@ -2,16 +2,25 @@ version: '0.2'
 
 phases:
   install:
+    runtime-versions:
+      nodejs: 20
     commands:
       - echo "instalando dependencias...."
-      - npm install
+      - cd "$CODEBUILD_SRC_DIR"
+      - pwd
+      - node -v
+      - npm -v
+      - npm ci
   pre_build:
     commands:
       - echo "ejecutando pruebas...."
-      - npm test
+      - cd "$CODEBUILD_SRC_DIR"
+      - pwd
+      - npm test --color
   build:
     commands:
       - echo "construyendo la aplicacion...."
+      - cd "$CODEBUILD_SRC_DIR"
       - zip -r code.zip .
   post_build:
     commands:
