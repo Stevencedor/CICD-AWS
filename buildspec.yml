@@ -23,5 +23,11 @@ phases:
 
 artifacts:
   files:
+    - buildspec.yml
+    - package.json
+    - package-lock.json
+    - index.js
+    - server.js
+    - app.test.js
     - code.zip
   discard-paths: yes
