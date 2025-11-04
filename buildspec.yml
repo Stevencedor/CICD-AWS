@@ -3,14 +3,22 @@ version: '0.2'
 phases:
   install:
     runtime-versions:
-      nodejs: 20
+      nodejs: 22
     commands:
       - echo "instalando dependencias...."
       - cd "$CODEBUILD_SRC_DIR"
       - pwd
+      - ls -la package*.json
+      - echo "Verificando contenido del package.json:"
+      - head -20 package.json
+      - echo "Verificando inicio del package-lock.json:"
+      - head -20 package-lock.json
       - node -v
       - npm -v
-      - npm ci
+      - echo "Limpiando posibles caches..."
+      - rm -rf node_modules package-lock.json 2>/dev/null || true
+      - echo "Instalando desde cero..."
+      - npm install --verbose
   pre_build:
     commands:
       - echo "ejecutando pruebas...."
