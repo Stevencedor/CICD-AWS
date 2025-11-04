@@ -5,31 +5,45 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - echo "instalando dependencias...."
-      - cd "$CODEBUILD_SRC_DIR"
+      - echo "===== DIAGNOSTICO DE DIRECTORIO ====="
+      - echo "CODEBUILD_SRC_DIR = $CODEBUILD_SRC_DIR"
       - pwd
-      - ls -la package*.json
-      - echo "Verificando contenido del package.json:"
-      - head -20 package.json
-      - echo "Verificando inicio del package-lock.json:"
-      - head -20 package-lock.json
+      - ls -la
+      - echo "===== BUSCANDO DIRECTORIO RAIZ DEL PROYECTO ====="
+      - |
+        # Buscar el directorio que contiene index.js y server.js (nuestro proyecto real)
+        ROOT_DIR=$(find /tmp/codebuild/output -name "index.js" -type f | head -1 | xargs dirname)
+        if [ -z "$ROOT_DIR" ]; then
+          echo "ERROR: No se encontró el directorio del proyecto"
+          exit 1
+        fi
+        echo "Directorio del proyecto encontrado: $ROOT_DIR"
+        cd "$ROOT_DIR"
+        export PROJECT_ROOT="$ROOT_DIR"
+      - pwd
+      - ls -la
+      - echo "===== VERIFICANDO ARCHIVOS DEL PROYECTO ====="
+      - cat package.json | head -20
       - node -v
       - npm -v
-      - echo "Limpiando posibles caches..."
-      - rm -rf node_modules package-lock.json 2>/dev/null || true
-      - echo "Instalando desde cero..."
-      - npm install --verbose
+      - echo "===== INSTALANDO DEPENDENCIAS ====="
+      - npm ci
   pre_build:
     commands:
-      - echo "ejecutando pruebas...."
-      - cd "$CODEBUILD_SRC_DIR"
+      - echo "===== EJECUTANDO PRUEBAS ====="
+      - |
+        ROOT_DIR=$(find /tmp/codebuild/output -name "index.js" -type f | head -1 | xargs dirname)
+        cd "$ROOT_DIR"
       - pwd
-      - npm test --color
+      - npm test
   build:
     commands:
-      - echo "construyendo la aplicacion...."
-      - cd "$CODEBUILD_SRC_DIR"
-      - zip -r code.zip .
+      - echo "===== CONSTRUYENDO APLICACION ====="
+      - |
+        ROOT_DIR=$(find /tmp/codebuild/output -name "index.js" -type f | head -1 | xargs dirname)
+        cd "$ROOT_DIR"
+      - pwd
+      - zip -r code.zip . -x "node_modules/*" -x ".git/*"
   post_build:
     commands:
       - echo "Build completed!"
