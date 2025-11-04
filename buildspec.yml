@@ -5,18 +5,18 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - cd "$CODEBUILD_SRC_DIR"
-      - test -f package.json || { echo "ERROR: package.json no encontrado en $CODEBUILD_SRC_DIR. Revisa la fuente del proyecto CodeBuild (CICD-Porject05)."; exit 2; }
-      - test -f index.js || { echo "ERROR: index.js no encontrado. Asegura que el repositorio correcto se esté utilizando como fuente."; exit 2; }
-      - node -v
-      - npm -v
-      - npm install --no-audit --no-fund
+      - 'cd "$CODEBUILD_SRC_DIR"'
+      - 'if [ ! -f package.json ]; then echo "ERROR: package.json no encontrado en $CODEBUILD_SRC_DIR. Revisa la fuente del proyecto CodeBuild (CICD-Porject05)."; exit 2; fi'
+      - 'if [ ! -f index.js ]; then echo "ERROR: index.js no encontrado. Asegura que el repositorio correcto se esté utilizando como fuente."; exit 2; fi'
+      - 'node -v'
+      - 'npm -v'
+      - 'npm install --no-audit --no-fund'
   pre_build:
     commands:
-      - npm test --color
+      - 'npm test --color'
   build:
     commands:
-      - zip -rq code.zip . -x "node_modules/*" -x ".git/*"
+      - 'zip -rq code.zip . -x "node_modules/*" -x ".git/*"'
   post_build:
     commands:
       - echo "Build completed!"
